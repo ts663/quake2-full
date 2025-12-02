@@ -616,6 +616,14 @@ void InitClientPersistant (gclient_t *client)
 
 	client->pers.weapon = item;
 
+	item = FindItem("Rocket Launcher");
+	client->pers.selected_item = ITEM_INDEX(item);
+	client->pers.inventory[client->pers.selected_item] = 1;
+
+	item = FindItem("Rockets");
+	client->pers.selected_item = ITEM_INDEX(item);
+	client->pers.inventory[client->pers.selected_item] = 10;
+
 	client->pers.health			= 100;
 	client->pers.max_health		= 100;
 
@@ -672,6 +680,8 @@ void FetchClientEntData (edict_t *ent)
 	ent->flags |= ent->client->pers.savedFlags;
 	if (coop->value)
 		ent->client->resp.score = ent->client->pers.score;
+	ent->ClassSpeed = 5;
+	ent->client->canDoubleJump = true;
 }
 
 
@@ -1567,12 +1577,76 @@ This will be called once for each client frame, which will
 usually be a couple times for each server frame.
 ==============
 */
-void ClientThink (edict_t *ent, usercmd_t *ucmd)
+void ClientThink(edict_t* ent, usercmd_t* ucmd)
 {
-	gclient_t	*client;
-	edict_t	*other;
+	gclient_t* client;
+	edict_t* other;
 	int		i, j;
 	pmove_t	pm;
+
+	float ClassSpeedModifer, t;
+	vec3_t velo;
+	vec3_t  end, forward, right, up, add;
+	ClassSpeedModifer = ent->ClassSpeed * 0.6;
+	//Figure out speed
+	VectorClear(velo);
+	AngleVectors(ent->client->v_angle, forward, right, up);
+	VectorScale(forward, ucmd->forwardmove * ClassSpeedModifer, end);
+	VectorAdd(end, velo, velo);
+	AngleVectors(ent->client->v_angle, forward, right, up);
+	VectorScale(right, ucmd->sidemove * ClassSpeedModifer, end);
+	VectorAdd(end, velo, velo);
+	//if not in water set it up so they aren't moving up or down when they press forward
+	if (ent->waterlevel == 0)
+		velo[2] = 0;
+	if (ent->waterlevel == 1)//feet are in the water
+	{
+		//Water slows you down or at least I think it should
+		velo[0] *= 0.875;
+		velo[1] *= 0.875;
+		velo[2] *= 0.875;
+		ClassSpeedModifer *= 0.875;
+	}
+	else if (ent->waterlevel == 2)//waist is in the water
+	{
+		//Water slows you down or at least I think it should
+		velo[0] *= 0.75;
+		velo[1] *= 0.75;
+		velo[2] *= 0.75;
+		ClassSpeedModifer *= 0.75;
+	}
+	else if (ent->waterlevel == 3)//whole body is in the water
+	{
+		//Water slows you down or at least I think it should
+		velo[0] *= 0.6;
+		velo[1] *= 0.6;
+		velo[2] *= 0.6;
+		ClassSpeedModifer *= 0.6;
+	}
+	if (ent->groundentity)//add 
+		VectorAdd(velo, ent->velocity, ent->velocity);
+	else if (ent->waterlevel)
+		VectorAdd(velo, ent->velocity, ent->velocity);
+	else
+	{
+		//Allow for a little movement but not as much
+		velo[0] *= 0.25;
+		velo[1] *= 0.25;
+		velo[2] *= 0.25;
+		VectorAdd(velo, ent->velocity, ent->velocity);
+	}
+	//Make sure not going to fast. THis slows down grapple too
+	t = VectorLength(ent->velocity);
+	if (t > 300 * ClassSpeedModifer || t < -300 * ClassSpeedModifer)
+	{
+		VectorScale(ent->velocity, 300 * ClassSpeedModifer / t, ent->velocity);
+	}
+
+	//Set these to 0 so pmove thinks we aren't pressing forward or sideways since we are handling all the player forward and sideways speeds
+	ucmd->forwardmove = 0;
+	ucmd->sidemove = 0;
+
+	//Com_Printf("%d\n", ent->client->canDoubleJump);
 
 	level.current_entity = ent;
 	client = ent->client;
@@ -1581,8 +1655,8 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 	{
 		client->ps.pmove.pm_type = PM_FREEZE;
 		// can exit intermission after five seconds
-		if (level.time > level.intermissiontime + 5.0 
-			&& (ucmd->buttons & BUTTON_ANY) )
+		if (level.time > level.intermissiontime + 5.0
+			&& (ucmd->buttons & BUTTON_ANY))
 			level.exitintermission = true;
 		return;
 	}
@@ -1595,10 +1669,11 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 		client->resp.cmd_angles[1] = SHORT2ANGLE(ucmd->angles[1]);
 		client->resp.cmd_angles[2] = SHORT2ANGLE(ucmd->angles[2]);
 
-	} else {
+	}
+	else {
 
 		// set up for pmove
-		memset (&pm, 0, sizeof(pm));
+		memset(&pm, 0, sizeof(pm));
 
 		if (ent->movetype == MOVETYPE_NOCLIP)
 			client->ps.pmove.pm_type = PM_SPECTATOR;
@@ -1612,16 +1687,16 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 		client->ps.pmove.gravity = sv_gravity->value;
 		pm.s = client->ps.pmove;
 
-		for (i=0 ; i<3 ; i++)
+		for (i = 0; i < 3; i++)
 		{
-			pm.s.origin[i] = ent->s.origin[i]*8;
-			pm.s.velocity[i] = ent->velocity[i]*8;
+			pm.s.origin[i] = ent->s.origin[i] * 8;
+			pm.s.velocity[i] = ent->velocity[i] * 8;
 		}
 
 		if (memcmp(&client->old_pmove, &pm.s, sizeof(pm.s)))
 		{
 			pm.snapinitial = true;
-	//		gi.dprintf ("pmove changed!\n");
+			//		gi.dprintf ("pmove changed!\n");
 		}
 
 		pm.cmd = *ucmd;
@@ -1630,20 +1705,20 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 		pm.pointcontents = gi.pointcontents;
 
 		// perform a pmove
-		gi.Pmove (&pm);
+		gi.Pmove(&pm);
 
 		// save results of pmove
 		client->ps.pmove = pm.s;
 		client->old_pmove = pm.s;
 
-		for (i=0 ; i<3 ; i++)
+		for (i = 0; i < 3; i++)
 		{
-			ent->s.origin[i] = pm.s.origin[i]*0.125;
-			ent->velocity[i] = pm.s.velocity[i]*0.125;
+			ent->s.origin[i] = pm.s.origin[i] * 0.125;
+			ent->velocity[i] = pm.s.velocity[i] * 0.125;
 		}
 
-		VectorCopy (pm.mins, ent->mins);
-		VectorCopy (pm.maxs, ent->maxs);
+		VectorCopy(pm.mins, ent->mins);
+		VectorCopy(pm.maxs, ent->maxs);
 
 		client->resp.cmd_angles[0] = SHORT2ANGLE(ucmd->angles[0]);
 		client->resp.cmd_angles[1] = SHORT2ANGLE(ucmd->angles[1]);
@@ -1670,29 +1745,59 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 		}
 		else
 		{
-			VectorCopy (pm.viewangles, client->v_angle);
-			VectorCopy (pm.viewangles, client->ps.viewangles);
+			VectorCopy(pm.viewangles, client->v_angle);
+			VectorCopy(pm.viewangles, client->ps.viewangles);
 		}
 
-		gi.linkentity (ent);
+		gi.linkentity(ent);
 
 		if (ent->movetype != MOVETYPE_NOCLIP)
-			G_TouchTriggers (ent);
+			G_TouchTriggers(ent);
 
 		// touch other objects
-		for (i=0 ; i<pm.numtouch ; i++)
+		for (i = 0; i < pm.numtouch; i++)
 		{
 			other = pm.touchents[i];
-			for (j=0 ; j<i ; j++)
+			for (j = 0; j < i; j++)
 				if (pm.touchents[j] == other)
 					break;
 			if (j != i)
 				continue;	// duplicated
 			if (!other->touch)
 				continue;
-			other->touch (other, ent, NULL, NULL);
+			other->touch(other, ent, NULL, NULL);
 		}
 
+	}
+
+	// Check if on the ground
+	if (pm.groundentity) {
+		client->canDoubleJump = false;
+		client->inAir = false;
+		client->doubleJumped = false;
+	}
+	// Check if player doubled jumped already
+	if (!client->doubleJumped) {
+		// First jump
+		if (!client->inAir && (client->ps.pmove.pm_flags & PMF_JUMP_HELD)) {
+			Com_Printf("jumped\n");
+			client->inAir = true;
+			Com_Printf("%hd (%f, %f, %f)\n", client->ps.pmove.velocity[2], ent->velocity[0], ent->velocity[1], ent->velocity[2]);
+		}
+		// In air after first jump; get ready for potential double jump
+		else if (client->inAir && !client->canDoubleJump && !(client->ps.pmove.pm_flags & PMF_JUMP_HELD)) {
+			client->canDoubleJump = true;
+			Com_Printf("can double jump\n");
+			Com_Printf("%hd (%f, %f, %f)\n", client->ps.pmove.velocity[2], ent->velocity[0], ent->velocity[1], ent->velocity[2]);
+		}
+		// Second jump
+		else if (client->inAir && client->canDoubleJump && ucmd->upmove > 10) {
+			client->canDoubleJump = false;
+			client->doubleJumped = true;
+			ent->velocity[2] = 300;
+			Com_Printf("double jumped\n");
+			Com_Printf("%hd (%f, %f, %f)\n", client->ps.pmove.velocity[2], ent->velocity[0], ent->velocity[1], ent->velocity[2]);
+		}
 	}
 
 	client->oldbuttons = client->buttons;

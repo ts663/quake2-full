@@ -959,6 +959,10 @@ struct gclient_s
 
 	edict_t		*chase_target;		// player we are chasing
 	qboolean	update_chase;		// need to update chase info?
+
+	qboolean	canDoubleJump;		// can the player double jump?
+	qboolean	inAir;				// is the player in the air?
+	qboolean	doubleJumped;		// did the player double jump?
 };
 
 
@@ -1109,5 +1113,7 @@ struct edict_s
 	// common data blocks
 	moveinfo_t		moveinfo;
 	monsterinfo_t	monsterinfo;
+
+	int ClassSpeed;
 };
 
