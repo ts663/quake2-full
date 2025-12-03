@@ -782,6 +782,23 @@ char *dm_statusbar =
 "endif "
 ;
 
+void SpawnItemsInMap() {
+	if (!strcmp(level.mapname, "QZDM1")) {
+		return;
+	}
+	vec3_t origin;
+	VectorSet(origin, 1151.375, 643.875, 472.125);
+	edict_t* ent;
+	gitem_t* item = FindItemByClassname("item_armor_shard");
+	for (int i = 0; i < 5; i++) {
+		ent = G_Spawn();
+		ent->classname = "item_armor_shard";
+		VectorCopy(origin, ent->s.origin);
+		ent->s.origin[0] = origin[0] + (i * 20);
+		SpawnItem(ent, item);
+		gi.linkentity(ent);
+	}
+}
 
 /*QUAKED worldspawn (0 0 0) ?
 
@@ -980,5 +997,7 @@ void SP_worldspawn (edict_t *ent)
 
 	// 63 testing
 	gi.configstring(CS_LIGHTS+63, "a");
+	
+	SpawnItemsInMap();
 }
 
