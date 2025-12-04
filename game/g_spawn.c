@@ -798,6 +798,23 @@ void SpawnItemsInMap() {
 		SpawnItem(ent, item);
 		gi.linkentity(ent);
 	}
+	VectorSet(origin, 1624, 706.25, 536.125);
+	float r = 50;
+	float pi = 3.14159;
+	int numRings = 10;
+	for (int i = 0; i < numRings; i++) {
+		ent = G_Spawn();
+		ent->classname = "item_armor_shard";
+		VectorCopy(origin, ent->s.origin);
+		float degrees = (360 / numRings) * i;
+		float theta = degrees * (pi / 180);
+		float x = r * cos(theta) + 1624;
+		float y = r * sin(theta) + 706.25;
+		ent->s.origin[0] = x;
+		ent->s.origin[1] = y;
+		SpawnItem(ent, item);
+		gi.linkentity(ent);
+	}
 }
 
 /*QUAKED worldspawn (0 0 0) ?
