@@ -1584,17 +1584,20 @@ void ClientThink(edict_t* ent, usercmd_t* ucmd)
 	int		i, j;
 	pmove_t	pm;
 
-	float ClassSpeedModifer, t;
+	float ClassSpeedModifier, t;
 	vec3_t velo;
 	vec3_t  end, forward, right, up, add;
-	ClassSpeedModifer = ent->ClassSpeed * 0.6;
+	ClassSpeedModifier = ent->ClassSpeed * 0.6;
+	if (ucmd->forwardmove > 200) {
+		ClassSpeedModifier *= 1.5;
+	}
 	//Figure out speed
 	VectorClear(velo);
 	AngleVectors(ent->client->v_angle, forward, right, up);
-	VectorScale(forward, ucmd->forwardmove * ClassSpeedModifer, end);
+	VectorScale(forward, ucmd->forwardmove * ClassSpeedModifier, end);
 	VectorAdd(end, velo, velo);
 	AngleVectors(ent->client->v_angle, forward, right, up);
-	VectorScale(right, ucmd->sidemove * ClassSpeedModifer, end);
+	VectorScale(right, ucmd->sidemove * ClassSpeedModifier, end);
 	VectorAdd(end, velo, velo);
 	//if not in water set it up so they aren't moving up or down when they press forward
 	if (ent->waterlevel == 0)
@@ -1605,7 +1608,7 @@ void ClientThink(edict_t* ent, usercmd_t* ucmd)
 		velo[0] *= 0.875;
 		velo[1] *= 0.875;
 		velo[2] *= 0.875;
-		ClassSpeedModifer *= 0.875;
+		ClassSpeedModifier *= 0.875;
 	}
 	else if (ent->waterlevel == 2)//waist is in the water
 	{
@@ -1613,7 +1616,7 @@ void ClientThink(edict_t* ent, usercmd_t* ucmd)
 		velo[0] *= 0.75;
 		velo[1] *= 0.75;
 		velo[2] *= 0.75;
-		ClassSpeedModifer *= 0.75;
+		ClassSpeedModifier *= 0.75;
 	}
 	else if (ent->waterlevel == 3)//whole body is in the water
 	{
@@ -1621,7 +1624,7 @@ void ClientThink(edict_t* ent, usercmd_t* ucmd)
 		velo[0] *= 0.6;
 		velo[1] *= 0.6;
 		velo[2] *= 0.6;
-		ClassSpeedModifer *= 0.6;
+		ClassSpeedModifier *= 0.6;
 	}
 	if (ent->groundentity)//add 
 		VectorAdd(velo, ent->velocity, ent->velocity);
@@ -1637,9 +1640,9 @@ void ClientThink(edict_t* ent, usercmd_t* ucmd)
 	}
 	//Make sure not going to fast. THis slows down grapple too
 	t = VectorLength(ent->velocity);
-	if (t > 300 * ClassSpeedModifer || t < -300 * ClassSpeedModifer)
+	if (t > 300 * ClassSpeedModifier || t < -300 * ClassSpeedModifier)
 	{
-		VectorScale(ent->velocity, 300 * ClassSpeedModifer / t, ent->velocity);
+		VectorScale(ent->velocity, 300 * ClassSpeedModifier / t, ent->velocity);
 	}
 
 	//Set these to 0 so pmove thinks we aren't pressing forward or sideways since we are handling all the player forward and sideways speeds
