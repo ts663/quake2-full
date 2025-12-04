@@ -681,7 +681,7 @@ void FetchClientEntData (edict_t *ent)
 	if (coop->value)
 		ent->client->resp.score = ent->client->pers.score;
 	ent->ClassSpeed = 5;
-	ent->client->canDoubleJump = true;
+	ent->client->rings = 0;
 }
 
 
@@ -1771,35 +1771,50 @@ void ClientThink(edict_t* ent, usercmd_t* ucmd)
 			other->touch(other, ent, NULL, NULL);
 		}
 
-	}
-
-	// Check if on the ground
-	if (pm.groundentity) {
-		client->canDoubleJump = false;
-		client->inAir = false;
-		client->doubleJumped = false;
-	}
-	// Check if player doubled jumped already
-	if (!client->doubleJumped) {
-		// First jump
-		if (!client->inAir && (client->ps.pmove.pm_flags & PMF_JUMP_HELD)) {
-			Com_Printf("jumped\n");
-			client->inAir = true;
-			Com_Printf("%hd (%f, %f, %f)\n", client->ps.pmove.velocity[2], ent->velocity[0], ent->velocity[1], ent->velocity[2]);
-		}
-		// In air after first jump; get ready for potential double jump
-		else if (client->inAir && !client->canDoubleJump && !(client->ps.pmove.pm_flags & PMF_JUMP_HELD)) {
-			client->canDoubleJump = true;
-			Com_Printf("can double jump\n");
-			Com_Printf("%hd (%f, %f, %f)\n", client->ps.pmove.velocity[2], ent->velocity[0], ent->velocity[1], ent->velocity[2]);
-		}
-		// Second jump
-		else if (client->inAir && client->canDoubleJump && ucmd->upmove > 10) {
+		// Check if on the ground
+		if (pm.groundentity) {
 			client->canDoubleJump = false;
-			client->doubleJumped = true;
-			ent->velocity[2] = 300;
-			Com_Printf("double jumped\n");
-			Com_Printf("%hd (%f, %f, %f)\n", client->ps.pmove.velocity[2], ent->velocity[0], ent->velocity[1], ent->velocity[2]);
+			client->inAir = false;
+			client->doubleJumped = false;
+			client->diving = false;
+		}
+		else {
+			// First jump/in air already
+			client->inAir = true;
+			// Check if the player is performing a stomp dive
+			if (!client->diving) {
+				// Stomp dive
+				if (client->inAir && ucmd->upmove < -10) {
+					client->diving = true;
+					ent->velocity[0] = 0;
+					ent->velocity[0] = 0;
+					ent->velocity[2] = -500;
+					//Com_Printf("stomp diving\n");
+				}
+				// Check if player doubled jumped already
+				else if (!client->doubleJumped) {
+					// In air after first jump; get ready for potential double jump
+					if (client->inAir && !client->canDoubleJump && !(client->ps.pmove.pm_flags & PMF_JUMP_HELD)) {
+						client->canDoubleJump = true;
+						/*Com_Printf("can double jump\n");
+						Com_Printf("%hd (%f, %f, %f)\n", client->ps.pmove.velocity[2], ent->velocity[0], ent->velocity[1], ent->velocity[2]);*/
+					}
+					// Second jump
+					else if (client->inAir && client->canDoubleJump && ucmd->upmove > 10) {
+						client->canDoubleJump = false;
+						client->doubleJumped = true;
+						ent->velocity[2] = 300;
+						/*Com_Printf("double jumped\n");
+						Com_Printf("%hd (%f, %f, %f)\n", client->ps.pmove.velocity[2], ent->velocity[0], ent->velocity[1], ent->velocity[2]);*/
+					}
+				}
+			}
+			// Make sure the player moves straight down when stomp diving
+			else {
+				ent->velocity[0] = 0;
+				ent->velocity[1] = 0;
+				ent->velocity[2] = -500;
+			}
 		}
 	}
 

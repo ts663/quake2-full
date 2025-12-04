@@ -963,6 +963,11 @@ struct gclient_s
 	qboolean	canDoubleJump;		// can the player double jump?
 	qboolean	inAir;				// is the player in the air?
 	qboolean	doubleJumped;		// did the player double jump?
+	qboolean	diving;				// is the player stomp diving?
+
+	int			rings;				// amount of rings the player has
+
+	qboolean	showModHelp;		// is the mod help menu showing?
 };
 
 
