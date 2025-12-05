@@ -904,6 +904,39 @@ void Cmd_Locate_f(edict_t *ent)
 	Com_Printf("%s: %f %f %f\n", ent->classname, ent->s.origin[0], ent->s.origin[1], ent->s.origin[2]);
 }
 
+void Cmd_HomingAttack_f(edict_t* ent) {
+	if (!ent->client->inAir || ent->client->isHoming) {
+		return;
+	}
+	edict_t* closest = NULL;
+	float maxDist = 350.0;
+	for (int i = 1; i < globals.num_edicts; i++) {
+		edict_t* e = g_edicts + i;
+		if (!e->inuse || e == ent) {
+			continue;
+		}
+		if (strncmp(e->classname, "monster", 7)) {
+			continue;
+		}
+		vec3_t v;
+		VectorSubtract(ent->s.origin, e->s.origin, v);
+		float dist = VectorLength(v);
+		if (dist <= maxDist) {
+			Com_Printf("%s is %f away from player\n", e->classname, dist);
+			if (dist < maxDist) {
+				maxDist = dist;
+				closest = e;
+			}
+		}
+	}
+	if (!closest) {
+		return;
+	}
+	Com_Printf("closest monster is %s at %f\n", closest->classname, maxDist);
+	ent->client->isHoming = true;
+	ent->client->homing_target = closest;
+}
+
 /*
 =================
 ClientCommand
@@ -993,8 +1026,8 @@ void ClientCommand (edict_t *ent)
 		Cmd_PlayerList_f(ent);
 	else if (Q_stricmp(cmd, "locate") == 0)
 		Cmd_Locate_f(ent);
-	else if (Q_stricmp(cmd, "doubleJump") == 0)
-		Cmd_DoubleJump_f(ent);
+	else if (Q_stricmp(cmd, "homingattack") == 0)
+		Cmd_HomingAttack_f(ent);
 	else	// anything that doesn't match a command will be a chat
 		Cmd_Say_f (ent, false, true);
 }
