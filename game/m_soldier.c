@@ -40,6 +40,7 @@ static int	sound_death;
 static int	sound_death_ss;
 static int	sound_cock;
 
+void TouchPlayer(edict_t* self, edict_t* other, cplane_t* plane, csurface_t* surf);
 
 void soldier_idle (edict_t *self)
 {
@@ -1260,6 +1261,7 @@ void SP_monster_soldier_light (edict_t *self)
 */
 void SP_monster_soldier (edict_t *self)
 {
+	//Com_Printf("spawn monster soldier\n");
 	if (deathmatch->value)
 	{
 		G_FreeEdict (self);
@@ -1275,6 +1277,35 @@ void SP_monster_soldier (edict_t *self)
 	self->s.skinnum = 2;
 	self->health = 30;
 	self->gib_health = -30;
+}
+
+void SP_monster_soldier_sonic(edict_t* self)
+{
+	SP_monster_soldier_x(self);
+
+	sound_pain = gi.soundindex("soldier/solpain1.wav");
+	sound_death = gi.soundindex("soldier/soldeth1.wav");
+	gi.soundindex("soldier/solatck1.wav");
+
+	self->s.skinnum = 2;
+	self->health = 30;
+	self->gib_health = -30;
+	
+	self->hits = 1;
+	self->touch = TouchPlayer;
+}
+
+void TouchPlayer(edict_t* self, edict_t* other, cplane_t* plane, csurface_t* surf) {
+	Com_Printf("touched %s\n", other->classname);
+	if (other->client) {
+		if (other->client->inAir) {
+			self->hits--;
+			other->client->isHoming = false;
+			if (self->hits <= 0) {
+				T_Damage(self, other, other, self->s.origin, other->s.origin, self->s.origin, self->health, 0, DAMAGE_NO_PROTECTION, MOD_TELEFRAG);
+			}
+		}
+	}
 }
 
 /*QUAKED monster_soldier_ss (1 .5 0) (-16 -16 -24) (16 16 32) Ambush Trigger_Spawn Sight

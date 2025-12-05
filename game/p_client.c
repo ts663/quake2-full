@@ -1095,7 +1095,6 @@ void spectator_respawn (edict_t *ent)
 
 //==============================================================
 
-
 /*
 ===========
 PutClientInServer
@@ -1587,7 +1586,7 @@ void ClientThink(edict_t* ent, usercmd_t* ucmd)
 	float ClassSpeedModifier, t;
 	vec3_t velo;
 	vec3_t  end, forward, right, up, add;
-	ClassSpeedModifier = ent->ClassSpeed * 0.6;
+	ClassSpeedModifier = ent->ClassSpeed * 0.3;
 	if (ucmd->forwardmove > 200) {
 		ClassSpeedModifier *= 1.5;
 	}
@@ -1761,8 +1760,14 @@ void ClientThink(edict_t* ent, usercmd_t* ucmd)
 		for (i = 0; i < pm.numtouch; i++)
 		{
 			other = pm.touchents[i];
+			if (!strncmp(other->classname, "monster", 7)) {
+				Com_Printf("%s\n", other->classname);
+			}
 			for (j = 0; j < i; j++)
 				if (pm.touchents[j] == other)
+					/*if (!strncmp(other->classname, "monster", 7)) {
+						Com_Printf("broke\n");
+					}*/
 					break;
 			if (j != i)
 				continue;	// duplicated
@@ -1777,6 +1782,17 @@ void ClientThink(edict_t* ent, usercmd_t* ucmd)
 			client->inAir = false;
 			client->doubleJumped = false;
 			client->diving = false;
+		}
+		// Check if performing homing attack
+		else if (client->isHoming) {
+			/*ent->touch = PlayerTouch;*/
+			vec3_t dir;
+			VectorSubtract(client->homing_target->s.origin, ent->s.origin, dir);
+			dir[2] += 20;
+			VectorNormalize(dir);
+			ent->velocity[0] += dir[0] * 500;
+			ent->velocity[1] += dir[1] * 500;
+			ent->velocity[2] += dir[2] * 500;
 		}
 		else {
 			// First jump/in air already
