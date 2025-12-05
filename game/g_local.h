@@ -964,6 +964,9 @@ struct gclient_s
 	qboolean	inAir;				// is the player in the air?
 	qboolean	doubleJumped;		// did the player double jump?
 	qboolean	diving;				// is the player stomp diving?
+	qboolean	isHoming;			// is the player doing a homing attack?
+
+	edict_t*	homing_target;		// player we are homing in on
 
 	int			rings;				// amount of rings the player has
 
@@ -1120,5 +1123,6 @@ struct edict_s
 	monsterinfo_t	monsterinfo;
 
 	int ClassSpeed;
+	int			hits;			// how many hits does it take to kill the enemy?
 };
 
