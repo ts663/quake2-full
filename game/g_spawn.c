@@ -144,6 +144,8 @@ void SP_turret_breach (edict_t *self);
 void SP_turret_base (edict_t *self);
 void SP_turret_driver (edict_t *self);
 
+void SP_monster_soldier_sonic (edict_t* self);
+
 
 spawn_t	spawns[] = {
 	{"item_health", SP_item_health},
@@ -265,6 +267,8 @@ spawn_t	spawns[] = {
 	{"turret_base", SP_turret_base},
 	{"turret_driver", SP_turret_driver},
 
+	{"monster_soldier_sonic", SP_monster_soldier_sonic},
+
 	{NULL, NULL}
 };
 
@@ -304,6 +308,7 @@ void ED_CallSpawn (edict_t *ent)
 	{
 		if (!strcmp(s->name, ent->classname))
 		{	// found it
+			//Com_Printf("spawn %s\n", ent->classname);
 			s->spawn (ent);
 			return;
 		}
@@ -783,7 +788,7 @@ char *dm_statusbar =
 ;
 
 void SpawnItemsInMap() {
-	if (!strcmp(level.mapname, "QZDM1")) {
+	if (strcmp(level.mapname, "Q2DM1")) {
 		return;
 	}
 	vec3_t origin;
@@ -798,6 +803,29 @@ void SpawnItemsInMap() {
 		SpawnItem(ent, item);
 		gi.linkentity(ent);
 	}
+	VectorSet(origin, 1624, 706.25, 536.125);
+	float r = 50;
+	float pi = 3.14159;
+	int numRings = 10;
+	for (int i = 0; i < numRings; i++) {
+		ent = G_Spawn();
+		ent->classname = "item_armor_shard";
+		VectorCopy(origin, ent->s.origin);
+		float degrees = (360 / numRings) * i;
+		float theta = degrees * (pi / 180);
+		float x = r * cos(theta) + 1624;
+		float y = r * sin(theta) + 706.25;
+		ent->s.origin[0] = x;
+		ent->s.origin[1] = y;
+		SpawnItem(ent, item);
+		gi.linkentity(ent);
+	}
+	Com_Printf("spawned rings -------------------\n");
+	VectorSet(origin, 1028.125, 464.375, 472.125);
+	ent = G_Spawn();
+	ent->classname = "monster_soldier_sonic";
+	VectorCopy(origin, ent->s.origin);
+	ED_CallSpawn(ent);
 }
 
 /*QUAKED worldspawn (0 0 0) ?
