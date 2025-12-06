@@ -1765,9 +1765,6 @@ void ClientThink(edict_t* ent, usercmd_t* ucmd)
 			}
 			for (j = 0; j < i; j++)
 				if (pm.touchents[j] == other)
-					/*if (!strncmp(other->classname, "monster", 7)) {
-						Com_Printf("broke\n");
-					}*/
 					break;
 			if (j != i)
 				continue;	// duplicated
@@ -1782,6 +1779,41 @@ void ClientThink(edict_t* ent, usercmd_t* ucmd)
 			client->inAir = false;
 			client->doubleJumped = false;
 			client->diving = false;
+			// Check if crouching to charge spin dash
+			if (ucmd->upmove < -10) {
+				if (!client->isSpinning) {
+					client->isSpinning = true;
+					client->chargeStartTime = level.time;
+					//Com_Printf("%f\n", client->chargeStartTime);
+				}
+			}
+			// When player stops crouching
+			else if (client->isSpinning) {
+				float elapsedTime = level.time - client->chargeStartTime;
+				//Com_Printf("%f\n", elapsedTime);
+				// Only spin dash if holding crouch for at least a second
+				if (elapsedTime >= 1.0f) {
+					if (elapsedTime > 3.0f) {
+						elapsedTime = 3.0f;
+					}
+					AngleVectors(ent->client->v_angle, forward, NULL, NULL);
+					VectorScale(forward, 1500 + ((elapsedTime - 1.0) * 750), client->dashVelocity);
+					client->dashVelocity[2] = 0;
+					client->dashStartTime = level.time;
+					client->isDashing = true;
+					//Com_Printf("spin dash\n");
+				}
+				client->isSpinning = false;
+			}
+			// Maintain velocity while dashing
+			else if (client->isDashing) {
+				if (level.time - client->dashStartTime <= 0.5f) {
+					VectorCopy(client->dashVelocity, ent->velocity);
+				}
+				else {
+					client->isDashing = false;
+				}
+			}
 		}
 		// Check if performing homing attack
 		else if (client->isHoming) {
