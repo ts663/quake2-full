@@ -965,10 +965,17 @@ struct gclient_s
 	qboolean	doubleJumped;		// did the player double jump?
 	qboolean	diving;				// is the player stomp diving?
 	qboolean	isHoming;			// is the player doing a homing attack?
+	qboolean	isSpinning;			// is the player charging a spin dash?
+	qboolean	isDashing;			// is the player performing a spin dash?
 
 	edict_t*	homing_target;		// player we are homing in on
 
 	int			rings;				// amount of rings the player has
+
+	float		chargeStartTime;	// time the player started charging spin dash
+	float		dashStartTime;		// time the player started spin dashing
+	
+	vec3_t		dashVelocity;
 
 	qboolean	showModHelp;		// is the mod help menu showing?
 };
