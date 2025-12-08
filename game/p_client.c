@@ -1262,6 +1262,11 @@ void PutClientInServer (edict_t *ent)
 	// force the current weapon up
 	client->newweapon = client->pers.weapon;
 	ChangeWeapon (ent);
+
+	gi.WriteByte(svc_layout);
+	gi.WriteString("xl 0 yt 6 string \"hello world\"");
+	Com_Printf("unicast to %s\n", ent->classname);
+	gi.unicast(ent, true);
 }
 
 /*
@@ -1587,6 +1592,9 @@ void ClientThink(edict_t* ent, usercmd_t* ucmd)
 	vec3_t velo;
 	vec3_t  end, forward, right, up, add;
 	ClassSpeedModifier = ent->ClassSpeed * 0.3;
+	if (ent->client->isDashing) {
+		ClassSpeedModifier *= 5;
+	}
 	if (ucmd->forwardmove > 200) {
 		ClassSpeedModifier *= 1.5;
 	}
@@ -1601,6 +1609,9 @@ void ClientThink(edict_t* ent, usercmd_t* ucmd)
 	//if not in water set it up so they aren't moving up or down when they press forward
 	if (ent->waterlevel == 0)
 		velo[2] = 0;
+	if (ent->client->isDashing) {
+		velo[2] = -500;
+	}
 	if (ent->waterlevel == 1)//feet are in the water
 	{
 		//Water slows you down or at least I think it should
@@ -1760,9 +1771,6 @@ void ClientThink(edict_t* ent, usercmd_t* ucmd)
 		for (i = 0; i < pm.numtouch; i++)
 		{
 			other = pm.touchents[i];
-			if (!strncmp(other->classname, "monster", 7)) {
-				Com_Printf("%s\n", other->classname);
-			}
 			for (j = 0; j < i; j++)
 				if (pm.touchents[j] == other)
 					break;
@@ -1863,6 +1871,13 @@ void ClientThink(edict_t* ent, usercmd_t* ucmd)
 				ent->velocity[1] = 0;
 				ent->velocity[2] = -500;
 			}
+		}
+	}
+
+	if (!ent->takedamage) {
+		if (level.time - ent->startInvincible >= 3.0f) {
+			ent->takedamage = DAMAGE_YES;
+			//Com_Printf("can take damage again\n");
 		}
 	}
 

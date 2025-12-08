@@ -1131,5 +1131,7 @@ struct edict_s
 
 	int ClassSpeed;
 	int			hits;			// how many hits does it take to kill the enemy?
+
+	float		startInvincible;	// time player starts invincibility
 };
 
