@@ -922,7 +922,7 @@ void Cmd_HomingAttack_f(edict_t* ent) {
 		VectorSubtract(ent->s.origin, e->s.origin, v);
 		float dist = VectorLength(v);
 		if (dist <= maxDist) {
-			Com_Printf("%s is %f away from player\n", e->classname, dist);
+			//Com_Printf("%s is %f away from player\n", e->classname, dist);
 			if (dist < maxDist) {
 				maxDist = dist;
 				closest = e;
@@ -932,7 +932,7 @@ void Cmd_HomingAttack_f(edict_t* ent) {
 	if (!closest) {
 		return;
 	}
-	Com_Printf("closest monster is %s at %f\n", closest->classname, maxDist);
+	//Com_Printf("closest monster is %s at %f\n", closest->classname, maxDist);
 	ent->client->isHoming = true;
 	ent->client->homing_target = closest;
 }

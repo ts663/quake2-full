@@ -1296,13 +1296,56 @@ void SP_monster_soldier_sonic(edict_t* self)
 }
 
 void TouchPlayer(edict_t* self, edict_t* other, cplane_t* plane, csurface_t* surf) {
-	Com_Printf("touched %s\n", other->classname);
+	//Com_Printf("touched %s\n", other->classname);
 	if (other->client) {
 		if (other->client->inAir) {
 			self->hits--;
 			other->client->isHoming = false;
 			if (self->hits <= 0) {
 				T_Damage(self, other, other, self->s.origin, other->s.origin, self->s.origin, self->health, 0, DAMAGE_NO_PROTECTION, MOD_TELEFRAG);
+				other->velocity[0] = 0;
+				other->velocity[1] = 0;
+				other->velocity[2] = 500;
+				//Com_Printf("killed enemy\n");
+			}
+		} else if (other->takedamage) {
+			if (other->client->rings <= 0) {
+				T_Damage(other, self, self, other->s.origin, self->s.origin, other->s.origin, other->health, 10, DAMAGE_NO_PROTECTION, MOD_TELEFRAG);
+				//Com_Printf("Game over\n");
+			}
+			else {
+				int numRings = 10;
+				if (other->client->rings < 10) {
+					numRings = other->client->rings;
+				}
+				if (other->client->rings < 50) {
+					other->client->rings = 0;
+				}
+				else {
+					other->client->rings -= 50;
+				}
+				other->takedamage = DAMAGE_NO;
+				other->startInvincible = level.time;
+				edict_t* ent;
+				gitem_t* item = FindItemByClassname("item_armor_shard");
+				vec3_t origin;
+				VectorCopy(other->s.origin, origin);
+				float r = 50;
+				float pi = 3.14159;
+				for (int i = 0; i < numRings; i++) {
+					ent = G_Spawn();
+					ent->classname = "item_armor_shard";
+					VectorCopy(origin, ent->s.origin);
+					float degrees = (360 / numRings) * i;
+					float theta = degrees * (pi / 180);
+					float x = r * cos(theta) + origin[0];
+					float y = r * sin(theta) + origin[1];
+					ent->s.origin[0] = x;
+					ent->s.origin[1] = y;
+					SpawnItem(ent, item);
+					gi.linkentity(ent);
+				}
+				//Com_Printf("got hit\n");
 			}
 		}
 	}
