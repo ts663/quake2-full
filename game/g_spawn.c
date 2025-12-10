@@ -145,6 +145,7 @@ void SP_turret_base (edict_t *self);
 void SP_turret_driver (edict_t *self);
 
 void SP_monster_soldier_sonic (edict_t* self);
+void SP_monster_flyer_sonic (edict_t* self);
 
 
 spawn_t	spawns[] = {
@@ -268,6 +269,7 @@ spawn_t	spawns[] = {
 	{"turret_driver", SP_turret_driver},
 
 	{"monster_soldier_sonic", SP_monster_soldier_sonic},
+	{"monster_flyer_sonic", SP_monster_flyer_sonic},
 
 	{NULL, NULL}
 };
@@ -820,10 +822,21 @@ void SpawnItemsInMap() {
 		SpawnItem(ent, item);
 		gi.linkentity(ent);
 	}
-	Com_Printf("spawned rings -------------------\n");
+	VectorSet(origin, 1620.875, 843.625, 472.125);
+	ent = G_Spawn();
+	ent->classname = "item_enviro";
+	item = FindItemByClassname("item_adrenaline");
+	VectorCopy(origin, ent->s.origin);
+	SpawnItem(ent, item);
+	gi.linkentity(ent);
 	VectorSet(origin, 1028.125, 464.375, 472.125);
 	ent = G_Spawn();
 	ent->classname = "monster_soldier_sonic";
+	VectorCopy(origin, ent->s.origin);
+	ED_CallSpawn(ent);
+	VectorSet(origin, 1238.75, 485.75, 472.125);
+	ent = G_Spawn();
+	ent->classname = "monster_flyer_sonic";
 	VectorCopy(origin, ent->s.origin);
 	ED_CallSpawn(ent);
 }

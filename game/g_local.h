@@ -967,6 +967,7 @@ struct gclient_s
 	qboolean	isHoming;			// is the player doing a homing attack?
 	qboolean	isSpinning;			// is the player charging a spin dash?
 	qboolean	isDashing;			// is the player performing a spin dash?
+	qboolean	isMagnetic;			// is the player using a magnet?
 
 	edict_t*	homing_target;		// player we are homing in on
 
@@ -974,8 +975,9 @@ struct gclient_s
 
 	float		chargeStartTime;	// time the player started charging spin dash
 	float		dashStartTime;		// time the player started spin dashing
+	float		magnetStartTime;	// time the player picked up a magnet
 	
-	vec3_t		dashVelocity;
+	vec3_t		dashVelocity;		// how fast the player is spin dashing
 
 	qboolean	showModHelp;		// is the mod help menu showing?
 };
