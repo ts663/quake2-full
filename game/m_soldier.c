@@ -1343,6 +1343,7 @@ void TouchPlayer(edict_t* self, edict_t* other, cplane_t* plane, csurface_t* sur
 					ent->s.origin[0] = x;
 					ent->s.origin[1] = y;
 					SpawnItem(ent, item);
+					ent->spawnflags ^= DROPPED_ITEM;
 					gi.linkentity(ent);
 				}
 				//Com_Printf("got hit\n");
