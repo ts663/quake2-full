@@ -1880,6 +1880,37 @@ void ClientThink(edict_t* ent, usercmd_t* ucmd)
 			//Com_Printf("can take damage again\n");
 		}
 	}
+	if (client->isMagnetic) {
+		float maxDist = 150.0f;
+		for (int i = 1; i < globals.num_edicts; i++) {
+			edict_t* e = g_edicts + i;
+			if (!e->inuse || e == ent || !e->item) {
+				continue;
+			}
+			if (strcmp(e->classname, "item_armor_shard")) {
+				continue;
+			}
+			vec3_t dir;
+			VectorSubtract(ent->s.origin, e->s.origin, dir);
+			float dist = VectorLength(dir);
+			if (dist <= maxDist) {
+				//Com_Printf("%s at distance %f\n", e->classname, dist);
+				if (dist > 20.0f) {
+					VectorScale(dir, 1.0f / dist, dir);
+					e->s.origin[0] += dir[0] * 10;
+					e->s.origin[1] += dir[1] * 10;
+					e->s.origin[2] += dir[2] * 10;
+				}
+				else {
+					e->item->pickup(e, ent);
+					G_FreeEdict(e);
+				}
+			}
+		}
+		if (level.time - client->magnetStartTime > 5.0f) {
+			client->isMagnetic = false;
+		}
+	}
 
 	client->oldbuttons = client->buttons;
 	client->buttons = ucmd->buttons;

@@ -198,6 +198,8 @@ qboolean Pickup_Adrenaline (edict_t *ent, edict_t *other)
 {
 	if (!deathmatch->value)
 		other->max_health += 1;
+	other->client->isMagnetic = true;
+	other->client->magnetStartTime = level.time;
 
 	if (other->health < other->max_health)
 		other->health = other->max_health;
