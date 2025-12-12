@@ -836,6 +836,13 @@ void SpawnItemsInMap() {
 	VectorCopy(origin, ent->s.origin);
 	SpawnItem(ent, item);
 	gi.linkentity(ent);
+	VectorSet(origin, 1291.125, 153, 664.125);
+	ent = G_Spawn();
+	ent->classname = "item_power_shield";
+	item = FindItemByClassname("item_power_shield");
+	VectorCopy(origin, ent->s.origin);
+	SpawnItem(ent, item);
+	gi.linkentity(ent);
 	VectorSet(origin, 1028.125, 464.375, 472.125);
 	ent = G_Spawn();
 	ent->classname = "monster_soldier_sonic";

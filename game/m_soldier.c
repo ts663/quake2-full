@@ -1300,6 +1300,15 @@ void TouchPlayer(edict_t* self, edict_t* other, cplane_t* plane, csurface_t* sur
 	if (other->client) {
 		if (other->client->inAir) {
 			self->hits--;
+			if (other->client->fireShield) {
+				self->hits--;
+				VectorMA(other->s.origin, -0.02, other->velocity, other->s.origin);
+				gi.WriteByte(svc_temp_entity);
+				gi.WriteByte(TE_ROCKET_EXPLOSION);
+				gi.WritePosition(other->s.origin);
+				gi.multicast(other->s.origin, MULTICAST_PHS);
+				other->client->fireShield = false;
+			}
 			other->client->isHoming = false;
 			if (self->hits <= 0) {
 				T_Damage(self, other, other, self->s.origin, other->s.origin, self->s.origin, self->health, 0, DAMAGE_NO_PROTECTION, MOD_TELEFRAG);
