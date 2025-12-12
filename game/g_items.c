@@ -721,7 +721,7 @@ void Use_PowerArmor (edict_t *ent, gitem_t *item)
 		index = ITEM_INDEX(FindItem("cells"));
 		if (!ent->client->pers.inventory[index])
 		{
-			gi.cprintf (ent, PRINT_HIGH, "No cells for power armor.\n");
+			//gi.cprintf (ent, PRINT_HIGH, "No cells for power armor.\n");
 			return;
 		}
 		ent->flags |= FL_POWER_ARMOR;
@@ -736,6 +736,9 @@ qboolean Pickup_PowerArmor (edict_t *ent, edict_t *other)
 	if (!strcmp(ent->classname, "item_power_shield")) {
 		other->client->fireShield = true;
 		other->client->fireShieldStartTime = level.time;
+	} else if (!strcmp(ent->classname, "item_power_screen")) {
+		other->client->speedBoost = true;
+		other->client->speedBoostStartTime = level.time;
 	}
 
 	quantity = other->client->pers.inventory[ITEM_INDEX(ent->item)];

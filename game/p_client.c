@@ -1592,10 +1592,12 @@ void ClientThink(edict_t* ent, usercmd_t* ucmd)
 	vec3_t velo;
 	vec3_t  end, forward, right, up, add;
 	ClassSpeedModifier = ent->ClassSpeed * 0.3;
+	if (ent->client->speedBoost) {
+		ClassSpeedModifier *= 2;
+	}
 	if (ent->client->isDashing) {
 		ClassSpeedModifier *= 5;
-	}
-	if (ucmd->forwardmove > 200) {
+	} else if (ucmd->forwardmove > 200) {
 		ClassSpeedModifier *= 1.5;
 	}
 	//Figure out speed
@@ -1918,6 +1920,13 @@ void ClientThink(edict_t* ent, usercmd_t* ucmd)
 	if (client->fireShield) {
 		if (level.time - client->fireShieldStartTime > 10.0f) {
 			client->fireShield = false;
+		}
+	}
+
+	if (client->speedBoost) {
+		if (level.time - client->speedBoostStartTime > 10.0f) {
+			client->speedBoost = false;
+			Com_Printf("end speed boost\n");
 		}
 	}
 
