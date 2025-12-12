@@ -616,13 +616,13 @@ void InitClientPersistant (gclient_t *client)
 
 	client->pers.weapon = item;
 
-	item = FindItem("Rocket Launcher");
+	/*item = FindItem("Rocket Launcher");
 	client->pers.selected_item = ITEM_INDEX(item);
 	client->pers.inventory[client->pers.selected_item] = 1;
 
 	item = FindItem("Rockets");
 	client->pers.selected_item = ITEM_INDEX(item);
-	client->pers.inventory[client->pers.selected_item] = 10;
+	client->pers.inventory[client->pers.selected_item] = 10;*/
 
 	client->pers.health			= 100;
 	client->pers.max_health		= 100;
