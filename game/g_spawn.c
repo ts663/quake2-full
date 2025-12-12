@@ -843,7 +843,14 @@ void SpawnItemsInMap() {
 	VectorCopy(origin, ent->s.origin);
 	SpawnItem(ent, item);
 	gi.linkentity(ent);
-	VectorSet(origin, 1028.125, 464.375, 472.125);
+	VectorSet(origin, 723.625, 612.5, 792.125);
+	ent = G_Spawn();
+	ent->classname = "item_poewr_shield";
+	item = FindItemByClassname("item_invulnerability");
+	VectorCopy(origin, ent->s.origin);
+	SpawnItem(ent, item);
+	gi.linkentity(ent);
+	/*VectorSet(origin, 1028.125, 464.375, 472.125);
 	ent = G_Spawn();
 	ent->classname = "monster_soldier_sonic";
 	VectorCopy(origin, ent->s.origin);
@@ -852,7 +859,7 @@ void SpawnItemsInMap() {
 	ent = G_Spawn();
 	ent->classname = "monster_flyer_sonic";
 	VectorCopy(origin, ent->s.origin);
-	ED_CallSpawn(ent);
+	ED_CallSpawn(ent);*/
 }
 
 /*QUAKED worldspawn (0 0 0) ?
