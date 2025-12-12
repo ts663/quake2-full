@@ -824,7 +824,7 @@ void SpawnItemsInMap() {
 	}
 	VectorSet(origin, 1620.875, 843.625, 472.125);
 	ent = G_Spawn();
-	ent->classname = "item_enviro";
+	ent->classname = "item_adrenaline";
 	item = FindItemByClassname("item_adrenaline");
 	VectorCopy(origin, ent->s.origin);
 	SpawnItem(ent, item);
@@ -845,8 +845,15 @@ void SpawnItemsInMap() {
 	gi.linkentity(ent);
 	VectorSet(origin, 723.625, 612.5, 792.125);
 	ent = G_Spawn();
-	ent->classname = "item_poewr_shield";
+	ent->classname = "item_invulnerability";
 	item = FindItemByClassname("item_invulnerability");
+	VectorCopy(origin, ent->s.origin);
+	SpawnItem(ent, item);
+	gi.linkentity(ent);
+	VectorSet(origin, 2016.25, 759.5, 408.125);
+	ent = G_Spawn();
+	ent->classname = "item_power_screen";
+	item = FindItemByClassname("item_power_screen");
 	VectorCopy(origin, ent->s.origin);
 	SpawnItem(ent, item);
 	gi.linkentity(ent);
