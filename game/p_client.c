@@ -1873,7 +1873,10 @@ void ClientThink(edict_t* ent, usercmd_t* ucmd)
 			}
 		}
 	}
-
+	
+	if (client->fireShield) {
+		ent->takedamage = DAMAGE_NO;
+	}
 	if (!ent->takedamage) {
 		if (level.time - ent->startInvincible >= 3.0f) {
 			ent->takedamage = DAMAGE_YES;
@@ -1907,8 +1910,14 @@ void ClientThink(edict_t* ent, usercmd_t* ucmd)
 				}
 			}
 		}
-		if (level.time - client->magnetStartTime > 5.0f) {
+		if (level.time - client->magnetStartTime > 10.0f) {
 			client->isMagnetic = false;
+		}
+	}
+
+	if (client->fireShield) {
+		if (level.time - client->fireShieldStartTime > 10.0f) {
+			client->fireShield = false;
 		}
 	}
 

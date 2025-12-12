@@ -731,6 +731,11 @@ qboolean Pickup_PowerArmor (edict_t *ent, edict_t *other)
 {
 	int		quantity;
 
+	if (!strcmp(ent->classname, "item_power_shield")) {
+		other->client->fireShield = true;
+		other->client->fireShieldStartTime = level.time;
+	}
+
 	quantity = other->client->pers.inventory[ITEM_INDEX(ent->item)];
 
 	other->client->pers.inventory[ITEM_INDEX(ent->item)]++;
