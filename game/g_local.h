@@ -968,6 +968,7 @@ struct gclient_s
 	qboolean	isSpinning;			// is the player charging a spin dash?
 	qboolean	isDashing;			// is the player performing a spin dash?
 	qboolean	isMagnetic;			// is the player using a magnet?
+	qboolean	isInvincible;		// is the player invinicible?
 	qboolean	fireShield;			// is the player using a fire shield?
 
 	edict_t*	homing_target;		// player we are homing in on
@@ -977,6 +978,7 @@ struct gclient_s
 	float		chargeStartTime;	// time the player started charging spin dash
 	float		dashStartTime;		// time the player started spin dashing
 	float		magnetStartTime;	// time the player picked up a magnet
+	float		invincibleStartTime;	// time the player started being invincible
 	float		fireShieldStartTime;	// time the player picked up a fire shield
 	
 	vec3_t		dashVelocity;		// how fast the player is spin dashing
