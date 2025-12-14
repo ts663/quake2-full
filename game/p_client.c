@@ -1597,7 +1597,8 @@ void ClientThink(edict_t* ent, usercmd_t* ucmd)
 	}
 	if (ent->client->isDashing) {
 		ClassSpeedModifier *= 5;
-	} else if (ucmd->forwardmove > 200) {
+	}
+	else if (ucmd->forwardmove > 200) {
 		ClassSpeedModifier *= 1.5;
 	}
 	//Figure out speed
@@ -1789,6 +1790,9 @@ void ClientThink(edict_t* ent, usercmd_t* ucmd)
 			client->inAir = false;
 			client->doubleJumped = false;
 			client->diving = false;
+			if (ucmd->upmove > 10 && client->isSpringy) {
+				ent->velocity[2] = 600;
+			}
 			// Check if crouching to charge spin dash
 			if (ucmd->upmove < -10) {
 				if (!client->isSpinning) {
@@ -1862,6 +1866,9 @@ void ClientThink(edict_t* ent, usercmd_t* ucmd)
 						client->canDoubleJump = false;
 						client->doubleJumped = true;
 						ent->velocity[2] = 300;
+						if (client->isSpringy) {
+							ent->velocity[2] *= 2;
+						}
 						/*Com_Printf("double jumped\n");
 						Com_Printf("%hd (%f, %f, %f)\n", client->ps.pmove.velocity[2], ent->velocity[0], ent->velocity[1], ent->velocity[2]);*/
 					}
@@ -1875,8 +1882,8 @@ void ClientThink(edict_t* ent, usercmd_t* ucmd)
 			}
 		}
 	}
-	
-	if (client->fireShield) {
+
+	if (client->basicShield || client->fireShield) {
 		ent->takedamage = DAMAGE_NO;
 	}
 	if (!ent->takedamage) {
@@ -1917,16 +1924,28 @@ void ClientThink(edict_t* ent, usercmd_t* ucmd)
 		}
 	}
 
+	if (client->isSpringy) {
+		if (level.time - client->springStartTime > 10.0f) {
+			client->isSpringy = false;
+		}
+	}
+
+	if (client->basicShield) {
+		if (level.time - client->shieldStartTime > 10.0f) {
+			client->basicShield = false;
+		}
+	}
+
 	if (client->fireShield) {
-		if (level.time - client->fireShieldStartTime > 10.0f) {
+		if (level.time - client->shieldStartTime > 10.0f) {
 			client->fireShield = false;
+
 		}
 	}
 
 	if (client->speedBoost) {
 		if (level.time - client->speedBoostStartTime > 10.0f) {
 			client->speedBoost = false;
-			Com_Printf("end speed boost\n");
 		}
 	}
 

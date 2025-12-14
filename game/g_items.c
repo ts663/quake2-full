@@ -622,6 +622,14 @@ qboolean Pickup_Armor (edict_t *ent, edict_t *other)
 
 	old_armor_index = ArmorIndex (other);
 
+	if (ent->item->tag == ARMOR_JACKET) {
+		other->client->basicShield = true;
+		other->client->shieldStartTime = level.time;
+	} else if (ent->item->tag == ARMOR_COMBAT) {
+		other->client->isSpringy = true;
+		other->client->springStartTime = level.time;
+	}
+
 	// handle armor shards specially
 	if (ent->item->tag == ARMOR_SHARD)
 	{
@@ -631,6 +639,7 @@ qboolean Pickup_Armor (edict_t *ent, edict_t *other)
 			other->client->pers.inventory[old_armor_index] += 2;
 		other->client->rings++;
 	}
+
 
 	// if player has no armor, just use it
 	else if (!old_armor_index)
@@ -735,7 +744,7 @@ qboolean Pickup_PowerArmor (edict_t *ent, edict_t *other)
 
 	if (!strcmp(ent->classname, "item_power_shield")) {
 		other->client->fireShield = true;
-		other->client->fireShieldStartTime = level.time;
+		other->client->shieldStartTime = level.time;
 	} else if (!strcmp(ent->classname, "item_power_screen")) {
 		other->client->speedBoost = true;
 		other->client->speedBoostStartTime = level.time;
