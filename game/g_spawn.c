@@ -822,6 +822,7 @@ void SpawnItemsInMap() {
 		SpawnItem(ent, item);
 		gi.linkentity(ent);
 	}
+	// Ring magnet
 	VectorSet(origin, 1620.875, 843.625, 472.125);
 	ent = G_Spawn();
 	ent->classname = "item_adrenaline";
@@ -829,6 +830,7 @@ void SpawnItemsInMap() {
 	VectorCopy(origin, ent->s.origin);
 	SpawnItem(ent, item);
 	gi.linkentity(ent);
+	// Homing mine
 	VectorSet(origin, 1249, 1135.5, 664.125);
 	ent = G_Spawn();
 	ent->classname = "weapon_rocketlauncher";
@@ -836,6 +838,7 @@ void SpawnItemsInMap() {
 	VectorCopy(origin, ent->s.origin);
 	SpawnItem(ent, item);
 	gi.linkentity(ent);
+	// Fire shield
 	VectorSet(origin, 1291.125, 153, 664.125);
 	ent = G_Spawn();
 	ent->classname = "item_power_shield";
@@ -843,6 +846,7 @@ void SpawnItemsInMap() {
 	VectorCopy(origin, ent->s.origin);
 	SpawnItem(ent, item);
 	gi.linkentity(ent);
+	// Invincibility
 	VectorSet(origin, 723.625, 612.5, 792.125);
 	ent = G_Spawn();
 	ent->classname = "item_invulnerability";
@@ -850,10 +854,27 @@ void SpawnItemsInMap() {
 	VectorCopy(origin, ent->s.origin);
 	SpawnItem(ent, item);
 	gi.linkentity(ent);
+	// Speed boost
 	VectorSet(origin, 2016.25, 759.5, 408.125);
 	ent = G_Spawn();
 	ent->classname = "item_power_screen";
 	item = FindItemByClassname("item_power_screen");
+	VectorCopy(origin, ent->s.origin);
+	SpawnItem(ent, item);
+	gi.linkentity(ent);
+	// Basic shield
+	VectorSet(origin, 1389.25, 233.625, 536.125);
+	ent = G_Spawn();
+	ent->classname = "item_armor_jacket";
+	item = FindItemByClassname("item_armor_jacket");
+	VectorCopy(origin, ent->s.origin);
+	SpawnItem(ent, item);
+	gi.linkentity(ent);
+	// Spring shoes
+	VectorSet(origin, 1592.875, 1018.625, 1048.125);
+	ent = G_Spawn();
+	ent->classname = "item_armor_combat";
+	item = FindItemByClassname("item_armor_combat");
 	VectorCopy(origin, ent->s.origin);
 	SpawnItem(ent, item);
 	gi.linkentity(ent);
@@ -862,11 +883,13 @@ void SpawnItemsInMap() {
 	ent->classname = "monster_soldier_sonic";
 	VectorCopy(origin, ent->s.origin);
 	ED_CallSpawn(ent);
-	VectorSet(origin, 1238.75, 485.75, 472.125);
+	gi.linkentity(ent);*/
+	/*VectorSet(origin, 1238.75, 485.75, 472.125);
 	ent = G_Spawn();
 	ent->classname = "monster_flyer_sonic";
 	VectorCopy(origin, ent->s.origin);
-	ED_CallSpawn(ent);*/
+	ED_CallSpawn(ent);
+	gi.linkentity(ent);*/
 }
 
 /*QUAKED worldspawn (0 0 0) ?

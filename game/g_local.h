@@ -970,6 +970,8 @@ struct gclient_s
 	qboolean	isMagnetic;			// is the player using a magnet?
 	qboolean	isInvincible;		// is the player invinicible?
 	qboolean	speedBoost;			// does the player have a speed boost?
+	qboolean	isSpringy;			// does the player have spring shoes?
+	qboolean	basicShield;		// is the player using a basic shield?
 	qboolean	fireShield;			// is the player using a fire shield?
 
 	edict_t*	homing_target;		// player we are homing in on
@@ -981,7 +983,8 @@ struct gclient_s
 	float		magnetStartTime;	// time the player picked up a magnet
 	float		invincibleStartTime;	// time the player started being invincible
 	float		speedBoostStartTime;	// time the player got speed boost
-	float		fireShieldStartTime;	// time the player picked up a fire shield
+	float		springStartTime;	// time the player got spring shoes
+	float		shieldStartTime;	// time the player picked up a fire shield
 	
 	vec3_t		dashVelocity;		// how fast the player is spin dashing
 
