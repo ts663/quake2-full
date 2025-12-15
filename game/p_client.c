@@ -682,6 +682,7 @@ void FetchClientEntData (edict_t *ent)
 		ent->client->resp.score = ent->client->pers.score;
 	ent->ClassSpeed = 5;
 	ent->client->rings = 0;
+	ent->client->gravityScale = 1.0f;
 }
 
 
@@ -1661,7 +1662,6 @@ void ClientThink(edict_t* ent, usercmd_t* ucmd)
 	//Set these to 0 so pmove thinks we aren't pressing forward or sideways since we are handling all the player forward and sideways speeds
 	ucmd->forwardmove = 0;
 	ucmd->sidemove = 0;
-
 	//Com_Printf("%d\n", ent->client->canDoubleJump);
 
 	level.current_entity = ent;
@@ -1700,7 +1700,7 @@ void ClientThink(edict_t* ent, usercmd_t* ucmd)
 		else
 			client->ps.pmove.pm_type = PM_NORMAL;
 
-		client->ps.pmove.gravity = sv_gravity->value;
+		client->ps.pmove.gravity = sv_gravity->value * client->gravityScale;
 		pm.s = client->ps.pmove;
 
 		for (i = 0; i < 3; i++)
@@ -1790,9 +1790,6 @@ void ClientThink(edict_t* ent, usercmd_t* ucmd)
 			client->inAir = false;
 			client->doubleJumped = false;
 			client->diving = false;
-			if (ucmd->upmove > 10 && client->isSpringy) {
-				ent->velocity[2] = 600;
-			}
 			// Check if crouching to charge spin dash
 			if (ucmd->upmove < -10) {
 				if (!client->isSpinning) {
@@ -1883,15 +1880,17 @@ void ClientThink(edict_t* ent, usercmd_t* ucmd)
 		}
 	}
 
-	if (client->basicShield || client->fireShield) {
+	if (client->basicShield || client->waterShield || client->fireShield) {
 		ent->takedamage = DAMAGE_NO;
 	}
-	if (!ent->takedamage) {
+	if (!ent->takedamage && client->isRecovering) {
 		if (level.time - ent->startInvincible >= 3.0f) {
 			ent->takedamage = DAMAGE_YES;
+			client->isRecovering = false;
 			//Com_Printf("can take damage again\n");
 		}
 	}
+
 	if (client->isMagnetic) {
 		float maxDist = 150.0f;
 		for (int i = 1; i < globals.num_edicts; i++) {
@@ -1933,6 +1932,13 @@ void ClientThink(edict_t* ent, usercmd_t* ucmd)
 	if (client->basicShield) {
 		if (level.time - client->shieldStartTime > 10.0f) {
 			client->basicShield = false;
+		}
+	}
+
+	if (client->waterShield) {
+		if (level.time - client->shieldStartTime > 10.0f) {
+			client->waterShield = false;
+			client->gravityScale = 1.0f;
 		}
 	}
 
