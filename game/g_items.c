@@ -625,9 +625,15 @@ qboolean Pickup_Armor (edict_t *ent, edict_t *other)
 	if (ent->item->tag == ARMOR_JACKET) {
 		other->client->basicShield = true;
 		other->client->shieldStartTime = level.time;
+		other->client->isInvincible = true;
 	} else if (ent->item->tag == ARMOR_COMBAT) {
 		other->client->isSpringy = true;
 		other->client->springStartTime = level.time;
+	}	else if (ent->item->tag == ARMOR_BODY) {
+		other->client->waterShield = true;
+		other->client->gravityScale = 0.2f;
+		other->client->shieldStartTime = level.time;
+		other->client->isInvincible = true;
 	}
 
 	// handle armor shards specially
@@ -745,6 +751,7 @@ qboolean Pickup_PowerArmor (edict_t *ent, edict_t *other)
 	if (!strcmp(ent->classname, "item_power_shield")) {
 		other->client->fireShield = true;
 		other->client->shieldStartTime = level.time;
+		other->client->isInvincible = true;
 	} else if (!strcmp(ent->classname, "item_power_screen")) {
 		other->client->speedBoost = true;
 		other->client->speedBoostStartTime = level.time;

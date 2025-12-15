@@ -1317,10 +1317,11 @@ void TouchPlayer(edict_t* self, edict_t* other, cplane_t* plane, csurface_t* sur
 				other->velocity[2] = 500;
 				//Com_Printf("killed enemy\n");
 			}
-		} else if (!other->client->isInvincible) {
+		}
+		else if (!other->client->isInvincible) {
 			if (other->takedamage) {
 				if (other->client->rings <= 0) {
-					T_Damage(other, self, self, other->s.origin, self->s.origin, other->s.origin, other->health, 10, DAMAGE_NO_PROTECTION, MOD_TELEFRAG);
+					T_Damage(other, self, self, other->s.origin, self->s.origin, other->s.origin, 1000, 10, DAMAGE_NO_PROTECTION, MOD_TELEFRAG);
 					//Com_Printf("Game over\n");
 				} else {
 					int numRings = 10;
@@ -1333,6 +1334,7 @@ void TouchPlayer(edict_t* self, edict_t* other, cplane_t* plane, csurface_t* sur
 						other->client->rings -= 50;
 					}
 					other->takedamage = DAMAGE_NO;
+					other->client->isRecovering = true;
 					other->startInvincible = level.time;
 					edict_t* ent;
 					gitem_t* item = FindItemByClassname("item_armor_shard");
@@ -1354,8 +1356,19 @@ void TouchPlayer(edict_t* self, edict_t* other, cplane_t* plane, csurface_t* sur
 						ent->spawnflags ^= DROPPED_ITEM;
 						gi.linkentity(ent);
 					}
-					//Com_Printf("got hit\n");
+					Com_Printf("got hit\n");
 				}
+			}
+		}
+		else {
+			if (other->client->basicShield || other->client->waterShield || other->client->fireShield) {
+				other->startInvincible = level.time;
+				other->client->basicShield = false;
+				other->client->waterShield = false;
+				other->client->fireShield = false;
+				other->client->isInvincible = false;
+				other->client->isRecovering = true;
+				//Com_Printf("shield nullified damage\n");
 			}
 		}
 	}

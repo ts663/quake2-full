@@ -878,12 +878,22 @@ void SpawnItemsInMap() {
 	VectorCopy(origin, ent->s.origin);
 	SpawnItem(ent, item);
 	gi.linkentity(ent);
-	/*VectorSet(origin, 1028.125, 464.375, 472.125);
+	// Water shield
+	VectorSet(origin, 1484.375, 1071.25, 920.25);
+	ent = G_Spawn();
+	ent->classname = "item_armor_body";
+	item = FindItemByClassname("item_armor_body");
+	VectorCopy(origin, ent->s.origin);
+	SpawnItem(ent, item);
+	gi.linkentity(ent);
+	// Basic enemy
+	VectorSet(origin, 1028.125, 464.375, 472.125);
 	ent = G_Spawn();
 	ent->classname = "monster_soldier_sonic";
 	VectorCopy(origin, ent->s.origin);
 	ED_CallSpawn(ent);
-	gi.linkentity(ent);*/
+	gi.linkentity(ent);
+	// Flying enemy
 	/*VectorSet(origin, 1238.75, 485.75, 472.125);
 	ent = G_Spawn();
 	ent->classname = "monster_flyer_sonic";
