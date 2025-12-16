@@ -1263,11 +1263,6 @@ void PutClientInServer (edict_t *ent)
 	// force the current weapon up
 	client->newweapon = client->pers.weapon;
 	ChangeWeapon (ent);
-
-	gi.WriteByte(svc_layout);
-	gi.WriteString("xl 0 yt 6 string \"hello world\"");
-	Com_Printf("unicast to %s\n", ent->classname);
-	gi.unicast(ent, true);
 }
 
 /*

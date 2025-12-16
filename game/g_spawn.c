@@ -900,6 +900,8 @@ void SpawnItemsInMap() {
 	VectorCopy(origin, ent->s.origin);
 	ED_CallSpawn(ent);
 	gi.linkentity(ent);*/
+	// Boss
+	VectorSet(origin, 820.875, 1619.375, 792.125);
 }
 
 /*QUAKED worldspawn (0 0 0) ?
