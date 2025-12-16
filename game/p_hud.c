@@ -163,91 +163,25 @@ DeathmatchScoreboardMessage
 */
 void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 {
-	char	entry[1024];
-	char	string[1400];
-	int		stringlength;
-	int		i, j, k;
-	int		sorted[MAX_CLIENTS];
-	int		sortedscores[MAX_CLIENTS];
-	int		score, total;
-	int		picnum;
-	int		x, y;
-	gclient_t	*cl;
-	edict_t		*cl_ent;
-	char	*tag;
+	char	string[1024];
 
-	// sort the clients by score
-	total = 0;
-	for (i=0 ; i<game.maxclients ; i++)
-	{
-		cl_ent = g_edicts + 1 + i;
-		if (!cl_ent->inuse || game.clients[i].resp.spectator)
-			continue;
-		score = game.clients[i].resp.score;
-		for (j=0 ; j<total ; j++)
-		{
-			if (score > sortedscores[j])
-				break;
-		}
-		for (k=total ; k>j ; k--)
-		{
-			sorted[k] = sorted[k-1];
-			sortedscores[k] = sortedscores[k-1];
-		}
-		sorted[j] = i;
-		sortedscores[j] = score;
-		total++;
-	}
+	// send the layout
+	Com_sprintf(string, sizeof(string),
+		"xv 32 yv 8 picn helpmenu "			// background
+		"xv 50 yv 35 string2 \"The mod allows you to move\" "
+		"xv 50 yv 45 string2 \"at high speeds and defeat\" "
+		"xv 50 yv 55 string2 \"enemies like Sonic would.\" "
+		"xv 50 yv 65 string2 \"The following buttons map to\" "
+		"xv 50 yv 75 string2 \"specific actions:\" "
+		"xv 50 yv 95 string2 \"F(in air) - homing attack\" "
+		"xv 50 yv 115 string2 \"C(hold) (on the ground) -\" "
+		"xv 50 yv 125 string2 \"charge spin dash\" "
+		"xv 50 yv 145 string2 \"C(in air) - stomp dive\" "
+	);
 
-	// print level name and exit rules
-	string[0] = 0;
-
-	stringlength = strlen(string);
-
-	// add the clients in sorted order
-	if (total > 12)
-		total = 12;
-
-	for (i=0 ; i<total ; i++)
-	{
-		cl = &game.clients[sorted[i]];
-		cl_ent = g_edicts + 1 + sorted[i];
-
-		picnum = gi.imageindex ("i_fixme");
-		x = (i>=6) ? 160 : 0;
-		y = 32 + 32 * (i%6);
-
-		// add a dogtag
-		if (cl_ent == ent)
-			tag = "tag1";
-		else if (cl_ent == killer)
-			tag = "tag2";
-		else
-			tag = NULL;
-		if (tag)
-		{
-			Com_sprintf (entry, sizeof(entry),
-				"xv %i yv %i picn %s ",x+32, y, tag);
-			j = strlen(entry);
-			if (stringlength + j > 1024)
-				break;
-			strcpy (string + stringlength, entry);
-			stringlength += j;
-		}
-
-		// send the layout
-		Com_sprintf (entry, sizeof(entry),
-			"client %i %i %i %i %i %i ",
-			x, y, sorted[i], cl->resp.score, cl->ping, (level.framenum - cl->resp.enterframe)/600);
-		j = strlen(entry);
-		if (stringlength + j > 1024)
-			break;
-		strcpy (string + stringlength, entry);
-		stringlength += j;
-	}
-
-	gi.WriteByte (svc_layout);
-	gi.WriteString (string);
+	gi.WriteByte(svc_layout);
+	gi.WriteString(string);
+	gi.unicast(ent, true);
 }
 
 
@@ -291,6 +225,27 @@ void Cmd_Score_f (edict_t *ent)
 	DeathmatchScoreboard (ent);
 }
 
+/*
+=================
+RingSystem
+
+Draw ring system.
+=================
+*/
+void RingSystem(edict_t* ent) {
+	Com_Printf("drawing rings\n");
+	char string[1024];
+	char* numRings = ent->client->rings;
+	Com_sprintf(string, sizeof(string),
+		"xv 32 yv 8 picn shard "
+		"xv 202 yv 12 string2 \"%s\" ",
+		numRings);
+	gi.WriteByte(svc_layout);
+	gi.WriteString(string);
+	gi.unicast(ent, true);
+	Com_Printf("done drawing rings\n");
+}
+
 
 /*
 ==================
@@ -302,37 +257,25 @@ Draw help computer.
 void HelpComputer (edict_t *ent)
 {
 	char	string[1024];
-	char	*sk;
-
-	if (skill->value == 0)
-		sk = "easy";
-	else if (skill->value == 1)
-		sk = "medium";
-	else if (skill->value == 2)
-		sk = "hard";
-	else
-		sk = "hard+";
 
 	// send the layout
 	Com_sprintf (string, sizeof(string),
-		"xv 32 yv 8 picn help "			// background
-		"xv 202 yv 12 string2 \"%s\" "		// skill
-		"xv 0 yv 24 cstring2 \"%s\" "		// level name
-		"xv 0 yv 54 cstring2 \"%s\" "		// help 1
-		"xv 0 yv 110 cstring2 \"%s\" "		// help 2
-		"xv 50 yv 164 string2 \" kills     goals    secrets\" "
-		"xv 50 yv 172 string2 \"%3i/%3i     %i/%i       %i/%i\" ", 
-		sk,
-		level.level_name,
-		game.helpmessage1,
-		game.helpmessage2,
-		level.killed_monsters, level.total_monsters, 
-		level.found_goals, level.total_goals,
-		level.found_secrets, level.total_secrets);
+		"xv 32 yv 8 picn helpmenu "			// background
+		"xv 50 yv 35 string2 \"The mod allows you to move\" "
+		"xv 50 yv 45 string2 \"at high speeds and defeat\" "
+		"xv 50 yv 55 string2 \"enemies like Sonic would.\" "
+		"xv 50 yv 65 string2 \"The following buttons map to\" "
+		"xv 50 yv 75 string2 \"specific actions:\" "
+		"xv 50 yv 95 string2 \"F(in air) - homing attack\" "
+		"xv 50 yv 115 string2 \"C(hold) (on the ground) -\" "
+		"xv 50 yv 125 string2 \"charge spin dash\" "
+		"xv 50 yv 145 string2 \"C(in air) - stomp dive\" "
+	);
 
 	gi.WriteByte (svc_layout);
 	gi.WriteString (string);
 	gi.unicast (ent, true);
+	Com_Printf("help computer\n");
 }
 
 
