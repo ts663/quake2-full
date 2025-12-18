@@ -214,7 +214,7 @@ static void fire_lead (edict_t *self, vec3_t start, vec3_t aimdir, int damage, i
 			tr = gi.trace (water_start, NULL, NULL, end, self, MASK_SHOT);
 		}
 	}
-
+	Com_Printf("shooting\n");
 	// send gun puff / flash
 	if (!((tr.surface) && (tr.surface->flags & SURF_SKY)))
 	{
@@ -222,7 +222,55 @@ static void fire_lead (edict_t *self, vec3_t start, vec3_t aimdir, int damage, i
 		{
 			if (tr.ent->takedamage)
 			{
-				T_Damage (tr.ent, self, self, aimdir, tr.endpos, tr.plane.normal, damage, kick, DAMAGE_BULLET, mod);
+				if (tr.ent->client) {
+					if (!tr.ent->client->isInvincible) {
+						if (tr.ent->takedamage) {
+							if (tr.ent->client->rings <= 0) {
+								T_Damage(tr.ent, self, self, aimdir, tr.endpos, tr.plane.normal, 1000, 10, DAMAGE_NO_PROTECTION, MOD_TELEFRAG);
+								//Com_Printf("Game over\n");
+							}
+							else {
+								int numRings = 10;
+								if (tr.ent->client->rings < 10) {
+									numRings = tr.ent->client->rings;
+								}
+								if (tr.ent->client->rings < 50) {
+									tr.ent->client->rings = 0;
+								}
+								else {
+									tr.ent->client->rings -= 50;
+								}
+								tr.ent->takedamage = DAMAGE_NO;
+								tr.ent->client->isRecovering = true;
+								tr.ent->startInvincible = level.time;
+								edict_t* ent;
+								gitem_t* item = FindItemByClassname("item_armor_shard");
+								vec3_t origin;
+								VectorCopy(tr.ent->s.origin, origin);
+								float r = 50;
+								float pi = 3.14159;
+								for (int i = 0; i < numRings; i++) {
+									ent = G_Spawn();
+									ent->classname = "item_armor_shard";
+									VectorCopy(origin, ent->s.origin);
+									float degrees = (360 / numRings) * i;
+									float theta = degrees * (pi / 180);
+									float x = r * cos(theta) + origin[0];
+									float y = r * sin(theta) + origin[1];
+									ent->s.origin[0] = x;
+									ent->s.origin[1] = y;
+									SpawnItem(ent, item);
+									ent->spawnflags ^= DROPPED_ITEM;
+									gi.linkentity(ent);
+								}
+								//Com_Printf("got hit\n");
+							}
+						}
+					}
+				}
+				else {
+					T_Damage(tr.ent, self, self, aimdir, tr.endpos, tr.plane.normal, damage, kick, DAMAGE_BULLET, mod);
+				}
 			}
 			else
 			{
@@ -321,11 +369,56 @@ void blaster_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *
 
 	if (other->takedamage)
 	{
-		if (self->spawnflags & 1)
-			mod = MOD_HYPERBLASTER;
-		else
-			mod = MOD_BLASTER;
-		T_Damage (other, self, self->owner, self->velocity, self->s.origin, plane->normal, self->dmg, 1, DAMAGE_ENERGY, mod);
+		if (other->client) {
+			if (other->takedamage) {
+				if (other->client->rings <= 0) {
+					T_Damage(other, self, self, other->s.origin, self->s.origin, other->s.origin, 1000, 10, DAMAGE_NO_PROTECTION, MOD_TELEFRAG);
+					//Com_Printf("Game over\n");
+				}
+				else {
+					int numRings = 10;
+					if (other->client->rings < 10) {
+						numRings = other->client->rings;
+					}
+					if (other->client->rings < 50) {
+						other->client->rings = 0;
+					}
+					else {
+						other->client->rings -= 50;
+					}
+					other->takedamage = DAMAGE_NO;
+					other->client->isRecovering = true;
+					other->startInvincible = level.time;
+					edict_t* ent;
+					gitem_t* item = FindItemByClassname("item_armor_shard");
+					vec3_t origin;
+					VectorCopy(other->s.origin, origin);
+					float r = 50;
+					float pi = 3.14159;
+					for (int i = 0; i < numRings; i++) {
+						ent = G_Spawn();
+						ent->classname = "item_armor_shard";
+						VectorCopy(origin, ent->s.origin);
+						float degrees = (360 / numRings) * i;
+						float theta = degrees * (pi / 180);
+						float x = r * cos(theta) + origin[0];
+						float y = r * sin(theta) + origin[1];
+						ent->s.origin[0] = x;
+						ent->s.origin[1] = y;
+						SpawnItem(ent, item);
+						ent->spawnflags ^= DROPPED_ITEM;
+						gi.linkentity(ent);
+					}
+					//Com_Printf("got hit\n");
+				}
+			}
+		} else {
+			if (self->spawnflags & 1)
+				mod = MOD_HYPERBLASTER;
+			else
+				mod = MOD_BLASTER;
+			T_Damage(other, self, self->owner, self->velocity, self->s.origin, plane->normal, self->dmg, 1, DAMAGE_ENERGY, mod);
+		}
 	}
 	else
 	{
@@ -585,10 +678,57 @@ void rocket_touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *su
 
 	// calculate position for the explosion entity
 	VectorMA (ent->s.origin, -0.02, ent->velocity, origin);
-
+	//
 	if (other->takedamage)
 	{
-		T_Damage (other, ent, ent->owner, ent->velocity, ent->s.origin, plane->normal, ent->dmg, 0, 0, MOD_ROCKET);
+		if (other->client) {
+			if (!other->client->isInvincible) {
+				if (other->takedamage) {
+					if (other->client->rings <= 0) {
+						T_Damage(other, ent, ent->owner, ent->velocity, ent->s.origin, plane->normal, 1000, 10, 0, MOD_ROCKET);
+						//Com_Printf("Game over\n");
+					}
+					else {
+						int numRings = 10;
+						if (other->client->rings < 10) {
+							numRings = other->client->rings;
+						}
+						if (other->client->rings < 50) {
+							other->client->rings = 0;
+						}
+						else {
+							other->client->rings -= 50;
+						}
+						other->takedamage = DAMAGE_NO;
+						other->client->isRecovering = true;
+						other->startInvincible = level.time;
+						edict_t* ent;
+						gitem_t* item = FindItemByClassname("item_armor_shard");
+						vec3_t origin;
+						VectorCopy(other->s.origin, origin);
+						float r = 50;
+						float pi = 3.14159;
+						for (int i = 0; i < numRings; i++) {
+							ent = G_Spawn();
+							ent->classname = "item_armor_shard";
+							VectorCopy(origin, ent->s.origin);
+							float degrees = (360 / numRings) * i;
+							float theta = degrees * (pi / 180);
+							float x = r * cos(theta) + origin[0];
+							float y = r * sin(theta) + origin[1];
+							ent->s.origin[0] = x;
+							ent->s.origin[1] = y;
+							SpawnItem(ent, item);
+							ent->spawnflags ^= DROPPED_ITEM;
+							gi.linkentity(ent);
+						}
+						//Com_Printf("got hit\n");
+					}
+				}
+			}
+		} else {
+			T_Damage(other, ent, ent->owner, ent->velocity, ent->s.origin, plane->normal, ent->dmg, 0, 0, MOD_ROCKET);
+		}
 	}
 	else
 	{

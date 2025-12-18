@@ -173,10 +173,10 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 		"xv 50 yv 55 string2 \"enemies like Sonic would.\" "
 		"xv 50 yv 65 string2 \"The following buttons map to\" "
 		"xv 50 yv 75 string2 \"specific actions:\" "
-		"xv 50 yv 95 string2 \"F(in air) - homing attack\" "
-		"xv 50 yv 115 string2 \"C(hold) (on the ground) -\" "
+		"xv 50 yv 95 string2 \"F (in air) - homing attack\" "
+		"xv 50 yv 115 string2 \"C (hold) (on the ground) -\" "
 		"xv 50 yv 125 string2 \"charge spin dash\" "
-		"xv 50 yv 145 string2 \"C(in air) - stomp dive\" "
+		"xv 50 yv 145 string2 \"C (in air) - stomp dive\" "
 	);
 
 	gi.WriteByte(svc_layout);
@@ -225,27 +225,6 @@ void Cmd_Score_f (edict_t *ent)
 	DeathmatchScoreboard (ent);
 }
 
-/*
-=================
-RingSystem
-
-Draw ring system.
-=================
-*/
-void RingSystem(edict_t* ent) {
-	Com_Printf("drawing rings\n");
-	char string[1024];
-	char* numRings = ent->client->rings;
-	Com_sprintf(string, sizeof(string),
-		"xv 32 yv 8 picn shard "
-		"xv 202 yv 12 string2 \"%s\" ",
-		numRings);
-	gi.WriteByte(svc_layout);
-	gi.WriteString(string);
-	gi.unicast(ent, true);
-	Com_Printf("done drawing rings\n");
-}
-
 
 /*
 ==================
@@ -266,10 +245,10 @@ void HelpComputer (edict_t *ent)
 		"xv 50 yv 55 string2 \"enemies like Sonic would.\" "
 		"xv 50 yv 65 string2 \"The following buttons map to\" "
 		"xv 50 yv 75 string2 \"specific actions:\" "
-		"xv 50 yv 95 string2 \"F(in air) - homing attack\" "
-		"xv 50 yv 115 string2 \"C(hold) (on the ground) -\" "
+		"xv 50 yv 95 string2 \"F (in air) - homing attack\" "
+		"xv 50 yv 115 string2 \"C (hold) (on the ground) -\" "
 		"xv 50 yv 125 string2 \"charge spin dash\" "
-		"xv 50 yv 145 string2 \"C(in air) - stomp dive\" "
+		"xv 50 yv 145 string2 \"C (in air) - stomp dive\" "
 	);
 
 	gi.WriteByte (svc_layout);
@@ -328,6 +307,8 @@ void G_SetStats (edict_t *ent)
 	//
 	ent->client->ps.stats[STAT_HEALTH_ICON] = level.pic_health;
 	ent->client->ps.stats[STAT_HEALTH] = ent->health;
+
+	ent->client->ps.stats[STAT_RINGS] = ent->client->rings;
 
 	//
 	// ammo

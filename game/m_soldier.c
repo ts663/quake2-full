@@ -1356,7 +1356,7 @@ void TouchPlayer(edict_t* self, edict_t* other, cplane_t* plane, csurface_t* sur
 						ent->spawnflags ^= DROPPED_ITEM;
 						gi.linkentity(ent);
 					}
-					Com_Printf("got hit\n");
+					//Com_Printf("got hit\n");
 				}
 			}
 		}

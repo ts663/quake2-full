@@ -144,8 +144,9 @@ void SP_turret_breach (edict_t *self);
 void SP_turret_base (edict_t *self);
 void SP_turret_driver (edict_t *self);
 
-void SP_monster_soldier_sonic (edict_t* self);
-void SP_monster_flyer_sonic (edict_t* self);
+void SP_monster_soldier_sonic (edict_t *self);
+void SP_monster_flyer_sonic (edict_t *self);
+void SP_monster_boss2_sonic(edict_t *self);
 
 
 spawn_t	spawns[] = {
@@ -270,6 +271,7 @@ spawn_t	spawns[] = {
 
 	{"monster_soldier_sonic", SP_monster_soldier_sonic},
 	{"monster_flyer_sonic", SP_monster_flyer_sonic},
+	{"monster_boss2_sonic", SP_monster_boss2_sonic},
 
 	{NULL, NULL}
 };
@@ -787,6 +789,12 @@ char *dm_statusbar =
   "xv 64 "
   "stat_string 16 "
 "endif "
+
+"xv -350 "
+"yv -250 "
+"picn shard "
+"xv -300 "
+"num 3 18 "
 ;
 
 void SpawnItemsInMap() {
@@ -902,6 +910,11 @@ void SpawnItemsInMap() {
 	gi.linkentity(ent);*/
 	// Boss
 	VectorSet(origin, 820.875, 1619.375, 792.125);
+	ent = G_Spawn();
+	ent->classname = "monster_boss2_sonic";
+	VectorCopy(origin, ent->s.origin);
+	ED_CallSpawn(ent);
+	gi.linkentity(ent);
 }
 
 /*QUAKED worldspawn (0 0 0) ?

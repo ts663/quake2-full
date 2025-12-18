@@ -52,6 +52,8 @@ void boss2_attack_mg (edict_t *self);
 void boss2_reattack_mg (edict_t *self);
 void boss2_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damage, vec3_t point);
 
+void TouchPlayer(edict_t* self, edict_t* other, cplane_t* plane, csurface_t* surf);
+
 void Boss2Rocket (edict_t *self)
 {
 	vec3_t	forward, right;
@@ -511,6 +513,11 @@ void boss2_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damage
 	self->takedamage = DAMAGE_NO;
 	self->count = 0;
 	self->monsterinfo.currentmove = &boss2_move_death;
+	VectorMA(inflictor->s.origin, -0.02, inflictor->velocity, inflictor->s.origin);
+	gi.WriteByte(svc_temp_entity);
+	gi.WriteByte(TE_ROCKET_EXPLOSION);
+	gi.WritePosition(inflictor->s.origin);
+	gi.multicast(inflictor->s.origin, MULTICAST_PHS);
 #if 0
 	int		n;
 
@@ -676,4 +683,46 @@ void SP_monster_boss2 (edict_t *self)
 	self->monsterinfo.scale = MODEL_SCALE;
 
 	flymonster_start (self);
+}
+
+void SP_monster_boss2_sonic(edict_t* self)
+{
+	sound_pain1 = gi.soundindex("bosshovr/bhvpain1.wav");
+	sound_pain2 = gi.soundindex("bosshovr/bhvpain2.wav");
+	sound_pain3 = gi.soundindex("bosshovr/bhvpain3.wav");
+	sound_death = gi.soundindex("bosshovr/bhvdeth1.wav");
+	sound_search1 = gi.soundindex("bosshovr/bhvunqv1.wav");
+
+	self->s.sound = gi.soundindex("bosshovr/bhvengn1.wav");
+
+	self->movetype = MOVETYPE_STEP;
+	self->solid = SOLID_BBOX;
+	self->s.modelindex = gi.modelindex("models/monsters/boss2/tris.md2");
+	VectorSet(self->mins, -56, -56, 0);
+	VectorSet(self->maxs, 56, 56, 80);
+
+	self->health = 2000;
+	self->gib_health = -200;
+	self->mass = 1000;
+
+	self->flags |= FL_IMMUNE_LASER;
+
+	self->pain = boss2_pain;
+	self->die = boss2_die;
+
+	self->monsterinfo.stand = boss2_stand;
+	self->monsterinfo.walk = boss2_walk;
+	self->monsterinfo.run = boss2_run;
+	self->monsterinfo.attack = boss2_attack;
+	self->monsterinfo.search = boss2_search;
+	self->monsterinfo.checkattack = Boss2_CheckAttack;
+	gi.linkentity(self);
+
+	self->monsterinfo.currentmove = &boss2_move_stand;
+	self->monsterinfo.scale = MODEL_SCALE;
+
+	self->hits = 3;
+	self->touch = TouchPlayer;
+
+	flymonster_start(self);
 }
