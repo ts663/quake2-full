@@ -1308,6 +1308,9 @@ void TouchPlayer(edict_t* self, edict_t* other, cplane_t* plane, csurface_t* sur
 				gi.WritePosition(other->s.origin);
 				gi.multicast(other->s.origin, MULTICAST_PHS);
 				other->client->fireShield = false;
+				other->client->isInvincible = false;
+				other->startInvincible = level.time;
+				other->client->isRecovering = true;
 			}
 			other->client->isHoming = false;
 			if (self->hits <= 0) {
