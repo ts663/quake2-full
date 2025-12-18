@@ -214,7 +214,6 @@ static void fire_lead (edict_t *self, vec3_t start, vec3_t aimdir, int damage, i
 			tr = gi.trace (water_start, NULL, NULL, end, self, MASK_SHOT);
 		}
 	}
-	Com_Printf("shooting\n");
 	// send gun puff / flash
 	if (!((tr.surface) && (tr.surface->flags & SURF_SKY)))
 	{
@@ -369,6 +368,7 @@ void blaster_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *
 
 	if (other->takedamage)
 	{
+		/*gi.sound(self, CHAN_VOICE, gi.soundindex("weapons/hgrenb1a.wav"), 1, ATTN_NORM, 0);*/
 		if (other->client) {
 			if (other->takedamage) {
 				if (other->client->rings <= 0) {

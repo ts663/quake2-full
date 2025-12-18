@@ -750,6 +750,7 @@ qboolean Pickup_PowerArmor (edict_t *ent, edict_t *other)
 
 	if (!strcmp(ent->classname, "item_power_shield")) {
 		other->client->fireShield = true;
+		Com_Printf("picked up fire shield\n");
 		other->client->shieldStartTime = level.time;
 		other->client->isInvincible = true;
 	} else if (!strcmp(ent->classname, "item_power_screen")) {

@@ -802,6 +802,7 @@ void SpawnItemsInMap() {
 		return;
 	}
 	vec3_t origin;
+	// Line of rings
 	VectorSet(origin, 1151.375, 643.875, 472.125);
 	edict_t* ent;
 	gitem_t* item = FindItemByClassname("item_armor_shard");
@@ -813,6 +814,34 @@ void SpawnItemsInMap() {
 		SpawnItem(ent, item);
 		gi.linkentity(ent);
 	}
+	VectorSet(origin, 2042.75, 604.875, 408.125);
+	for (int i = 0; i < 10; i++) {
+		ent = G_Spawn();
+		ent->classname = "item_armor_shard";
+		VectorCopy(origin, ent->s.origin);
+		ent->s.origin[1] = origin[1] + (i * 20);
+		SpawnItem(ent, item);
+		gi.linkentity(ent);
+	}
+	VectorSet(origin, 1936.125, 604.875, 408.125);
+	for (int i = 0; i < 10; i++) {
+		ent = G_Spawn();
+		ent->classname = "item_armor_shard";
+		VectorCopy(origin, ent->s.origin);
+		ent->s.origin[1] = origin[1] + (i * 20);
+		SpawnItem(ent, item);
+		gi.linkentity(ent);
+	}
+	VectorSet(origin, 1653.25, -193.125, 664.125);
+	for (int i = 0; i < 10; i++) {
+		ent = G_Spawn();
+		ent->classname = "item_armor_shard";
+		VectorCopy(origin, ent->s.origin);
+		ent->s.origin[0] = origin[0] + (i * 20);
+		SpawnItem(ent, item);
+		gi.linkentity(ent);
+	}
+	// Circle of rings
 	VectorSet(origin, 1624, 706.25, 536.125);
 	float r = 50;
 	float pi = 3.14159;
@@ -823,8 +852,39 @@ void SpawnItemsInMap() {
 		VectorCopy(origin, ent->s.origin);
 		float degrees = (360 / numRings) * i;
 		float theta = degrees * (pi / 180);
-		float x = r * cos(theta) + 1624;
-		float y = r * sin(theta) + 706.25;
+		float x = r * cos(theta) + origin[0];
+		float y = r * sin(theta) + origin[1];
+		ent->s.origin[0] = x;
+		ent->s.origin[1] = y;
+		SpawnItem(ent, item);
+		gi.linkentity(ent);
+	}
+	VectorSet(origin, 1355.375, 1604.125, 856.125);
+	for (int i = 0; i < numRings; i++) {
+		ent = G_Spawn();
+		ent->classname = "item_armor_shard";
+		VectorCopy(origin, ent->s.origin);
+		float degrees = (360 / numRings) * i;
+		float theta = degrees * (pi / 180);
+		float x = r * cos(theta) + origin[0];
+		float y = r * sin(theta) + origin[1];
+		ent->s.origin[0] = x;
+		ent->s.origin[1] = y;
+		SpawnItem(ent, item);
+		gi.linkentity(ent);
+	}
+	// Large circle of rings
+	VectorSet(origin, 618.25, 1272.625, 792.125);
+	r = 100;
+	numRings = 20;
+	for (int i = 0; i < numRings; i++) {
+		ent = G_Spawn();
+		ent->classname = "item_armor_shard";
+		VectorCopy(origin, ent->s.origin);
+		float degrees = (360 / numRings) * i;
+		float theta = degrees * (pi / 180);
+		float x = r * cos(theta) + origin[0];
+		float y = r * sin(theta) + origin[1];
 		ent->s.origin[0] = x;
 		ent->s.origin[1] = y;
 		SpawnItem(ent, item);
@@ -851,6 +911,12 @@ void SpawnItemsInMap() {
 	ent = G_Spawn();
 	ent->classname = "item_power_shield";
 	item = FindItemByClassname("item_power_shield");
+	VectorCopy(origin, ent->s.origin);
+	SpawnItem(ent, item);
+	gi.linkentity(ent);
+	VectorSet(origin, 1413.25, 1184.125, 920.25);
+	ent = G_Spawn();
+	ent->classname = "item_power_shield";
 	VectorCopy(origin, ent->s.origin);
 	SpawnItem(ent, item);
 	gi.linkentity(ent);
@@ -886,8 +952,21 @@ void SpawnItemsInMap() {
 	VectorCopy(origin, ent->s.origin);
 	SpawnItem(ent, item);
 	gi.linkentity(ent);
+	VectorSet(origin, 1903.875, 791.375, 1048.125);
+	ent = G_Spawn();
+	ent->classname = "item_armor_combat";
+	VectorCopy(origin, ent->s.origin);
+	SpawnItem(ent, item);
+	gi.linkentity(ent);
 	// Water shield
 	VectorSet(origin, 1484.375, 1071.25, 920.25);
+	ent = G_Spawn();
+	ent->classname = "item_armor_body";
+	item = FindItemByClassname("item_armor_body");
+	VectorCopy(origin, ent->s.origin);
+	SpawnItem(ent, item);
+	gi.linkentity(ent);
+	VectorSet(origin, 590.625, 674.75, 792.125);
 	ent = G_Spawn();
 	ent->classname = "item_armor_body";
 	item = FindItemByClassname("item_armor_body");
@@ -901,13 +980,49 @@ void SpawnItemsInMap() {
 	VectorCopy(origin, ent->s.origin);
 	ED_CallSpawn(ent);
 	gi.linkentity(ent);
+	VectorSet(origin, 1986.25, 366.75, 408.125);
+	ent = G_Spawn();
+	ent->classname = "monster_soldier_sonic";
+	VectorCopy(origin, ent->s.origin);
+	ED_CallSpawn(ent);
+	gi.linkentity(ent);
+	VectorSet(origin, 1412, 1352.125, 920.25);
+	ent = G_Spawn();
+	ent->classname = "monster_soldier_sonic";
+	VectorCopy(origin, ent->s.origin);
+	ED_CallSpawn(ent);
+	gi.linkentity(ent);
+	VectorSet(origin, 1487, 32.25, 664.125);
+	ent = G_Spawn();
+	ent->classname = "monster_soldier_sonic";
+	VectorCopy(origin, ent->s.origin);
+	ED_CallSpawn(ent);
+	gi.linkentity(ent);
 	// Flying enemy
-	/*VectorSet(origin, 1238.75, 485.75, 472.125);
+	VectorSet(origin, 1238.75, 485.75, 472.125);
 	ent = G_Spawn();
 	ent->classname = "monster_flyer_sonic";
 	VectorCopy(origin, ent->s.origin);
 	ED_CallSpawn(ent);
-	gi.linkentity(ent);*/
+	gi.linkentity(ent);
+	VectorSet(origin, 1848.375, 1252.125, 1048.125);
+	ent = G_Spawn();
+	ent->classname = "monster_flyer_sonic";
+	VectorCopy(origin, ent->s.origin);
+	ED_CallSpawn(ent);
+	gi.linkentity(ent);
+	VectorSet(origin, 1493.875, 1234.125, 792.125);
+	ent = G_Spawn();
+	ent->classname = "monster_flyer_sonic";
+	VectorCopy(origin, ent->s.origin);
+	ED_CallSpawn(ent);
+	gi.linkentity(ent);
+	VectorSet(origin, 1296.125, 1234.125, 792.125);
+	ent = G_Spawn();
+	ent->classname = "monster_flyer_sonic";
+	VectorCopy(origin, ent->s.origin);
+	ED_CallSpawn(ent);
+	gi.linkentity(ent);
 	// Boss
 	VectorSet(origin, 820.875, 1619.375, 792.125);
 	ent = G_Spawn();

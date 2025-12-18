@@ -1355,6 +1355,10 @@ void ClientBegin (edict_t *ent)
 		}
 	}
 
+	gi.WriteByte(svc_stufftext);
+	gi.WriteString("playtrack 1\n");
+	gi.unicast(ent, true);
+
 	// make sure all view stuff is valid
 	ClientEndServerFrame (ent);
 }
@@ -1587,7 +1591,7 @@ void ClientThink(edict_t* ent, usercmd_t* ucmd)
 	float ClassSpeedModifier, t;
 	vec3_t velo;
 	vec3_t  end, forward, right, up, add;
-	ClassSpeedModifier = ent->ClassSpeed * 0.3;
+	ClassSpeedModifier = ent->ClassSpeed * 0.6;
 	if (ent->client->speedBoost) {
 		ClassSpeedModifier *= 2;
 	}
@@ -1927,6 +1931,8 @@ void ClientThink(edict_t* ent, usercmd_t* ucmd)
 	if (client->basicShield) {
 		if (level.time - client->shieldStartTime > 10.0f) {
 			client->basicShield = false;
+			client->isInvincible = false;
+			ent->takedamage = DAMAGE_YES;
 		}
 	}
 
@@ -1934,13 +1940,16 @@ void ClientThink(edict_t* ent, usercmd_t* ucmd)
 		if (level.time - client->shieldStartTime > 10.0f) {
 			client->waterShield = false;
 			client->gravityScale = 1.0f;
+			client->isInvincible = false;
+			ent->takedamage = DAMAGE_YES;
 		}
 	}
 
 	if (client->fireShield) {
 		if (level.time - client->shieldStartTime > 10.0f) {
 			client->fireShield = false;
-
+			client->isInvincible = false;
+			ent->takedamage = DAMAGE_YES;
 		}
 	}
 
